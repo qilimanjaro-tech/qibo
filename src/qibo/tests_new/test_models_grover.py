@@ -58,6 +58,18 @@ def test_grover_initial_state(backend):
     assert solution == ["11111"]
     qibo.set_backend(original_backend)
 
+    
+def test_grover_target_amplitude(backend):
+    original_backend = qibo.get_backend()
+    qibo.set_backend(backend)
+    oracle = Circuit(5 + 1)
+    oracle.add(gates.X(5).controlled_by(*range(5)))
+    grover = Grover(oracle, superposition_qubits=5, target_amplitude = 1/2**(5/2))
+    solution, iterations = grover(logs=True)
+    assert len(solution) == 1
+    assert solution == ['11111']
+    qibo.set_backend(original_backend)
+    
 
 def test_grover_wrong_solution(backend):
     original_backend = qibo.get_backend()
