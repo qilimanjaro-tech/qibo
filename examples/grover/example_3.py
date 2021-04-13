@@ -5,8 +5,8 @@ from scipy.special import binom as binomial
 import itertools
 from qibo.models import Grover
 
-qubits = 7
-num_1 = 5
+qubits = 10
+num_1 = 9
 
 def set_ancillas_to_num(ancillas, num):
     '''Set a quantum register to a specific number.
@@ -144,20 +144,19 @@ def oracle(n, s):
 
 oracle = oracle(qubits, num_1)
 
-print(oracle.draw())
-
 or_circuit = Circuit(oracle.nqubits)
 
 or_circuit.add(oracle.on_qubits(*(list(range(qubits)) + [oracle.nqubits - 1] + list(range(qubits, oracle.nqubits - 1)))))
 
-print(or_circuit.draw())
-
 superposition = superposition_circuit(qubits, num_1)
 
-superposition.add(gates.M(*range(7)))
+superposition.add(gates.M(*range(superposition.nqubits)))
 
+grover = Grover(or_circuit, superposition_circuit=superposition, superposition_qubits=qubits, number_solutions=1,
+                superposition_size=int(binomial(qubits, num_1)))
 
-grover = Grover(oracle, superposition_circuit=superposition, superposition_qubits=qubits, number_solutions=1)
+'''for i in range(26):
+    print(grover.circuit(i).execute(nshots=10000).frequencies())'''
 
 '''print(grover.oracle.draw())
 print(grover.superposition.draw())'''
