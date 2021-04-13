@@ -4,8 +4,6 @@ from qibo.models import Circuit
 import numpy as np
 from scipy.special import binom
 
-# Create an oracle. Ex: Oracle that detects state |11111>
-
 qubits = 10
 num_1 = 2
 
@@ -52,23 +50,32 @@ def check(instance, num_1):
     res = instance.count('1') == num_1
     return res
 
-# Create superoposition circuit. Ex: Full  superposition over 5 qubits.
 
-
-'''superposition = Circuit(qubits)
-superposition.add([gates.H(i) for i in range(qubits)])
-# Generate and execute Grover class'''
 oracle = oracle(qubits, num_1)
 
-print(oracle.draw())
+#################################################################
+###################### NON ITERATIVE MODEL ######################
+#################################################################
 
 grover = Grover(oracle, superposition_qubits=qubits, number_solutions=int(binom(qubits, num_1)))
 
 
-
-# grover = Grover(oracle, superposition_circuit=superposition, superposition_qubits=qubits, check=check, check_args=(num_1,))
 solution, iterations = grover()
+
+print('NON ITERATIVE MODEL: \n\n')
 
 print('The solution is', solution)
 print('Number of iterations needed:', iterations)
 print('\nFound number of solutions: ',len(solution),'\nTheoretical number of solutions:', int(binom(qubits, num_1)))
+
+#################################################################
+######################## ITERATIVE MODEL ########################
+#################################################################
+
+print('ITERATIVE MODEL: \n\n')
+
+
+grover = Grover(oracle, superposition_qubits=qubits, check=check, check_args=(num_1,))
+solution, iterations = grover()
+
+print('Found solution:', solution)

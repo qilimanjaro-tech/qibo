@@ -95,31 +95,10 @@ def superposition_circuit(n, r):
     return c
 
 
-def check_superposition(n, r, nshots=10000):
-    '''Checks that the superposition has been created correctly.
-
-    '''
-    n_anc = int(np.ceil(np.log2(r + 1)))
-    c = Circuit(n + n_anc)
-    c += superposition_circuit(n, r)
-    c.add(gates.M(*range(n)))
-    result = c(nshots=nshots)
-    print('-' * 37)
-    print('| Column choices  | Probability     |')
-    print('-' * 37)
-    for i in result.frequencies():
-        print('|', i, ' ' * (14 - n), '|', result.frequencies()[i] / nshots,
-              ' ' * (14 - len(str(result.frequencies()[i] / nshots))), '|')
-        print('-' * 37)
-    print('\n')
-
-
 def oracle(n, s):
     """
     Oracle checks whether the first s terms are 1
-    :param n:
-    :param r:
-    :return:
+
     """
     if s > 2:
         n_anc = s - 2
@@ -141,25 +120,15 @@ def oracle(n, s):
         oracle.add(gates.X(n).controlled_by(*range(s)))
 
         return oracle
-
-oracle = oracle(qubits, num_1)
-
-or_circuit = Circuit(oracle.nqubits)
-
-or_circuit.add(oracle.on_qubits(*(list(range(qubits)) + [oracle.nqubits - 1] + list(range(qubits, oracle.nqubits - 1)))))
-
 superposition = superposition_circuit(qubits, num_1)
 
-superposition.add(gates.M(*range(superposition.nqubits)))
+oracle = oracle(qubits, num_1)
+or_circuit = Circuit(oracle.nqubits)
+or_circuit.add(oracle.on_qubits(*(list(range(qubits)) + [oracle.nqubits - 1] + list(range(qubits, oracle.nqubits - 1)))))
 
 grover = Grover(or_circuit, superposition_circuit=superposition, superposition_qubits=qubits, number_solutions=1,
                 superposition_size=int(binomial(qubits, num_1)))
 
-'''for i in range(26):
-    print(grover.circuit(i).execute(nshots=10000).frequencies())'''
-
-'''print(grover.oracle.draw())
-print(grover.superposition.draw())'''
 solution, iterations = grover()
 
 print('The solution is', solution)
