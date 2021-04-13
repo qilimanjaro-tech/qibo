@@ -12,7 +12,6 @@ superposition.add([gates.H(i) for i in range(5)])
 # Generate and execute Grover class
 grover = Grover(oracle, superposition_circuit=superposition, number_solutions=1)
 
-print(grover.circuit(1).draw())
 solution, iterations = grover()
 
 print('The solution is', solution)
