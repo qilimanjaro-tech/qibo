@@ -6,7 +6,7 @@ import itertools
 from qibo.models import Grover
 
 qubits = 10
-num_1 = 9
+num_1 = 5
 
 def set_ancillas_to_num(ancillas, num):
     '''Set a quantum register to a specific number.

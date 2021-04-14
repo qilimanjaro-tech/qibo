@@ -62,7 +62,7 @@ grover = Grover(oracle, superposition_qubits=qubits, number_solutions=int(binom(
 
 solution, iterations = grover()
 
-print('NON ITERATIVE MODEL: \n\n')
+print('\nNON ITERATIVE MODEL: \n')
 
 print('The solution is', solution)
 print('Number of iterations needed:', iterations)
@@ -72,7 +72,7 @@ print('\nFound number of solutions: ',len(solution),'\nTheoretical number of sol
 ######################## ITERATIVE MODEL ########################
 #################################################################
 
-print('ITERATIVE MODEL: \n\n')
+print('\nITERATIVE MODEL: \n')
 
 
 grover = Grover(oracle, superposition_qubits=qubits, check=check, check_args=(num_1,))
