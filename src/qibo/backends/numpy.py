@@ -391,7 +391,8 @@ class JITCustomBackend(NumpyBackend):
         self.name = "qibojit"
         self.op = op
 
-        try:
+        try: # pragma: no cover
+            # CI does not use GPUs
             from cupy import cuda # pylint: disable=E0401
             # CI does not have GPUs so cupy is not tested
             ngpu = cuda.runtime.getDeviceCount()
@@ -439,7 +440,8 @@ class JITCustomBackend(NumpyBackend):
 
     def set_device(self, name):
         abstract.AbstractBackend.set_device(self, name)
-        if "GPU" in name:
+        if "GPU" in name: # pragma: no cover
+            # CI does not use GPUs
             self.set_engine("cupy")
         else:
             self.set_engine("numba")
