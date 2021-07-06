@@ -375,7 +375,7 @@ class NumpyBackend(abstract.AbstractBackend):
         self.np.testing.assert_allclose(value, target, rtol=rtol, atol=atol)
 
 
-class JITCustomBackend(NumpyBackend): # pragma: no cover
+class JITCustomBackend(NumpyBackend):
 
     description = "Uses custom operators based on numba.jit for CPU and " \
                   "custom CUDA kernels loaded with cupy GPU."
@@ -386,13 +386,14 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
             # CI can compile custom operators so this case is not tested
             raise_error(RuntimeError, "Cannot initialize qibojit "
                                       "if the qibojit is not installed.")
-        from qibojit import custom_operators as op # pylint: disable=E0401
+        from qibojit import custom_operators as op
         super().__init__()
         self.name = "qibojit"
         self.op = op
 
         try:
             from cupy import cuda # pylint: disable=E0401
+            # CI does not have GPUs so cupy is not tested
             ngpu = cuda.runtime.getDeviceCount()
         except:
             ngpu = 0
@@ -403,7 +404,6 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
         if "NUMBA_NUM_THREADS" in os.environ: # pragma: no cover
             self.set_threads(int(os.environ.get("NUMBA_NUM_THREADS")))
 
-        # TODO: reconsider device management
         self.cpu_devices = ["/CPU:0"]
         self.gpu_devices = [f"/GPU:{i}" for i in range(ngpu)]
         if self.gpu_devices: # pragma: no cover
@@ -415,15 +415,15 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
             self.set_engine("numba")
             self.set_threads(self.nthreads)
 
-    def set_engine(self, name): # pragma: no cover
+    def set_engine(self, name):
         """Switcher between ``cupy`` for GPU and ``numba`` for CPU."""
         if name == "numba":
             import numpy as xp
             self.tensor_types = (xp.ndarray,)
-        elif name == "cupy":
+        elif name == "cupy": # pragma: no cover
             import cupy as xp # pylint: disable=E0401
             self.tensor_types = (self.np.ndarray, xp.ndarray)
-        else:
+        else: # pragma: no cover
             raise_error(ValueError, "Unknown engine {}.".format(name))
         self.backend = xp
         self.numeric_types = (int, float, complex, xp.int32,
@@ -446,7 +446,7 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
 
     def set_threads(self, nthreads):
         super().set_threads(nthreads)
-        import numba # pylint: disable=E0401
+        import numba
         numba.set_num_threads(nthreads)
 
     def to_numpy(self, x):
@@ -460,7 +460,7 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
         return self.op.cast(x, dtype=dtype)
 
     def check_shape(self, shape):
-        if self.op.get_backend() == "cupy" and isinstance(shape, self.Tensor):
+        if self.op.get_backend() == "cupy" and isinstance(shape, self.Tensor): # pragma: no cover
             shape = shape.get()
         return shape
 
@@ -477,7 +477,7 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
         return super().ones(self.check_shape(shape), dtype=dtype)
 
     def expm(self, x):
-        if self.op.get_backend() == "cupy":
+        if self.op.get_backend() == "cupy": # pragma: no cover
             # Fallback to numpy because cupy does not have expm
             if isinstance(x, self.native_types):
                 x = x.get()
@@ -485,14 +485,14 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
         return super().expm(x)
 
     def unique(self, x, return_counts=False):
-        if self.op.get_backend() == "cupy":
+        if self.op.get_backend() == "cupy": # pragma: no cover
             if isinstance(x, self.native_types):
                 x = x.get()
             # Uses numpy backend always
         return super().unique(x, return_counts)
 
     def gather(self, x, indices=None, condition=None, axis=0):
-        if self.op.get_backend() == "cupy":
+        if self.op.get_backend() == "cupy": # pragma: no cover
             # Fallback to numpy because cupy does not support tuple indexing
             if isinstance(x, self.native_types):
                 x = x.get()
@@ -520,7 +520,7 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
         from qibo.config import SHOT_METROPOLIS_THRESHOLD
         if nshots < SHOT_METROPOLIS_THRESHOLD:
             return super().sample_frequencies(probs, nshots)
-        if self.op.get_backend() == "cupy":
+        if self.op.get_backend() == "cupy": # pragma: no cover
             probs = probs.get()
         dtype = self._dtypes.get('DTYPEINT')
         seed = self.np.random.randint(0, int(1e8), dtype=dtype)
@@ -605,7 +605,7 @@ class JITCustomBackend(NumpyBackend): # pragma: no cover
         return state / self.trace(state)
 
     def assert_allclose(self, value, target, rtol=1e-7, atol=0.0):
-        if self.op.get_backend() == "cupy":
+        if self.op.get_backend() == "cupy": # pragma: no cover
             if isinstance(value, self.backend.ndarray):
                 value = value.get()
             if isinstance(target, self.backend.ndarray):
