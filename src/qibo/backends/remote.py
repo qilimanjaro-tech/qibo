@@ -14,6 +14,6 @@ class QilimanjaroBackend(NumpyBackend):  # pragma: no cover
         import qilimanjaroq  # pylint: disable=E0401
         from qibo import gates
         self.is_hardware = True
-        self.hardware_module = qilimanjaroq
+        # self.hardware_module = qilimanjaroq
         self.hardware_gates = gates
         self.hardware_circuit = qilimanjaroq.circuit.RemoteCircuit
