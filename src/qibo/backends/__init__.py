@@ -12,6 +12,7 @@ class Backend:
 
         self.available_backends = {}
         self.hardware_backends = {}
+        self.remote_backends = {}
         active_backend = "numpy"
 
         # load profile from default file
@@ -53,6 +54,13 @@ class Backend:
                     self.hardware_backends[name] = custom_backend
                 if profile.get('default') == name:
                     active_backend = name
+
+        # check if Qilimanjaro backend is installed
+        if self.check_availability("qilimanjaroq"):  # pragma: no cover
+            # hardware backend is not tested until `qilimanjaroq` is available
+            from qibo.backends.remote import QilimanjaroBackend
+            self.available_backends["qilimanjaroq"] = QilimanjaroBackend
+            self.remote_backends["qilimanjaroq"] = QilimanjaroBackend
 
         self.constructed_backends = {}
         self._active_backend = None
