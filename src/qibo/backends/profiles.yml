@@ -18,5 +18,9 @@ backends:
     from: qibo.backends.hardware
     is_hardware: True
 
+  - name: qilimanjaroq
+    class: QilimanjaroBackend
+    from: qibo.backends.remote
+    is_hardware: True
 # default active backend after importing all modules
 default: qibojit
