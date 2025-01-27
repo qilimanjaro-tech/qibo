@@ -74,7 +74,7 @@ def test_assert_placement_error_graph_not_connected(star_connectivity):
     connectivity = star_connectivity()
     circuit = Circuit(5)
     connectivity.add_edge(5, 6)
-    with pytest.raises(ConnectivityError):
+    with pytest.raises(ConnectivityError, match="Connectivity graph is not connected."):
         assert_placement(circuit, connectivity)
 
 
