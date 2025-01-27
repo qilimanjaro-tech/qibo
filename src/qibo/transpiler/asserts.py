@@ -130,6 +130,9 @@ def assert_placement(circuit: Circuit, connectivity: nx.Graph):
             ValueError,
             "Connectivity graph is not provided",
         )
+        
+    if not nx.is_connected(connectivity):
+        raise_error(ConnectivityError, "Connectivity graph is not connected.")
 
     if circuit.nqubits != len(circuit.wire_names) or circuit.nqubits != len(
         connectivity.nodes
