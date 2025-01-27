@@ -194,7 +194,7 @@ def test_star_connectivity_placer_error(first, star_connectivity):
 
     chip = nx.Graph()
     chip.add_edges_from([(0, 1), (1, 2), (2, 3), (3, 4)])
-    with pytest.raises(ValueError):
+    with pytest.raises(ConnectivityError):
         placer = StarConnectivityPlacer(chip)
         placer(circ)
 
@@ -203,9 +203,7 @@ def test_star_connectivity_plus_disconnected_edges(star_connectivity):
     connectivity = star_connectivity()
     connectivity.add_edge(5, 6)
     placer = StarConnectivityPlacer(connectivity=connectivity)
-    error_msg = (
-        "This connectivity graph is not a star graph. Length of nodes provided: 7 != 5."
-    )
+    error_msg = "Connectivity graph is not connected."
     with pytest.raises(ConnectivityError, match=error_msg):
         placer(Circuit(5))
 
