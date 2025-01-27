@@ -70,6 +70,13 @@ def test_assert_placement_false(qubits, names, star_connectivity):
     with pytest.raises(ValueError):
         assert_placement(circuit, connectivity)
 
+def test_assert_placement_error_graph_not_connected(star_connectivity):
+    connectivity = star_connectivity()
+    circuit = Circuit(5)
+    connectivity.add_edge(5, 6)
+    with pytest.raises(ConnectivityError):
+        assert_placement(circuit, connectivity)
+
 
 @pytest.mark.parametrize("qubits", [10, 1])
 def test_assert_placement_error(qubits, star_connectivity):
